@@ -1,0 +1,1961 @@
+/**
+ * CS-GY 6513 Big Data - Homework 4
+ * Name: Runze Li
+ * netId: rl50xx
+ * 
+ * In this experiment, I used MongoDB Compass for the experiment.
+ * Specifically, I imported all datasets into 'local' database and created separate collections.
+ * 
+ * |-----------------------------------------|--------------------|
+ * |                  file                   |     collection     |
+ * |-----------------------------------------|--------------------|
+ * | restaurants.json                        | restaurants        |
+ * | Restaurants_in_Durham_County_NC (1).csv | durham_restaurants |
+ * | durham-nc-foreclosure-2006-2016.json    | durham_foreclosure |
+ * | meteorites.json                         | meteorites         |
+ * | worldcities.csv                         | worldcities        |
+ * |-----------------------------------------|--------------------|
+ * 
+ * For all command lines in the file, copy and paste them sentence by sentence into the mongodb shell so that each question can be answered.
+ * 
+ * PS: All commands need to be executed by going to the shell command line of the "local" database in mongodb.
+ * PS: For commands that output a lot of data, I usually write the first data in the job file and mark it with “Type ‘it’ for more”, otherwise I write all the output data in the file.
+ */
+
+/***********************************************************************************/
+
+/**
+ * Q0. 
+ * Load all datasets into MongoDB. 
+ * Prove it.
+ * 
+ * Answer: 
+ * Enter the following command to get the result.
+ */
+
+show dbs
+/**
+ * Result:
+ * 
+admin    40.00 KiB
+config  108.00 KiB
+local     4.13 MiB
+ */
+
+show collections
+/**
+ * Result:
+ * 
+durham_foreclosure
+durham_restaurants
+meteorites
+restaurants
+startup_log
+worldcities
+ */
+
+/***********************************************************************************/
+
+/** 
+ * Q1. 
+ * Write MongoDB queries for (2 points each):
+ * Datasets: restaurants.json
+ * 
+ * Answer:
+ * Enter the following command to get the result.
+ */
+
+// 1. Count the number of documents in the collection.
+db["restaurants"].countDocuments()
+/**
+ * Result:
+ * 
+3772
+ */
+
+// 2. Display all the documents in the collection.
+db["restaurants"].find()
+/**
+ * Result: (We only output one example here:)
+ * 
+{
+  _id: ObjectId('6745878fc8b289cffe4671b6'),
+  address: {
+    building: '1007',
+    coord: [
+      -73.856077,
+      40.848447
+    ],
+    street: 'Morris Park Ave',
+    zipcode: '10462'
+  },
+  borough: 'Bronx',
+  cuisine: 'Bakery',
+  grades: [
+    {
+      date: 2014-03-03T00:00:00.000Z,
+      grade: 'A',
+      score: 2
+    },
+    {
+      date: 2013-09-11T00:00:00.000Z,
+      grade: 'A',
+      score: 6
+    },
+    {
+      date: 2013-01-24T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2011-11-23T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2011-03-10T00:00:00.000Z,
+      grade: 'B',
+      score: 14
+    }
+  ],
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+Type "it" for more
+ */
+
+// 3. Display: restaurant_id, name, borough and cuisine for all the documents.
+db["restaurants"].find({}, {restaurant_id:true, name:true, borough:true, cuisine:true})
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671b6'),
+  borough: 'Bronx',
+  cuisine: 'Bakery',
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+Type "it" for more
+ */
+
+// 4. Display: restaurant_id, name, borough and cuisine, but exclude field _id, for all the documents in the collection.
+db["restaurants"].find({}, {restaurant_id:true, name:true, borough:true, cuisine:true, _id:false})
+/**
+ * Result:
+{
+  borough: 'Bronx',
+  cuisine: 'Bakery',
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+Type "it" for more
+ */
+
+// 5. Display: restaurant_id, name, borough and zip code, exclude the field _id for all the documents in the collection. 
+db["restaurants"].find({}, {restaurant_id:true, name:true, borough:true, "address.zipcode":true, _id:false})
+/**
+ * Result:
+{
+  address: {
+    zipcode: '10462'
+  },
+  borough: 'Bronx',
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+Type "it" for more
+ */
+
+// 6. Display all the restaurants in the Bronx. 
+db["restaurants"].find({borough: "Bronx"})
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671b6'),
+  address: {
+    building: '1007',
+    coord: [
+      -73.856077,
+      40.848447
+    ],
+    street: 'Morris Park Ave',
+    zipcode: '10462'
+  },
+  borough: 'Bronx',
+  cuisine: 'Bakery',
+  grades: [
+    {
+      date: 2014-03-03T00:00:00.000Z,
+      grade: 'A',
+      score: 2
+    },
+    {
+      date: 2013-09-11T00:00:00.000Z,
+      grade: 'A',
+      score: 6
+    },
+    {
+      date: 2013-01-24T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2011-11-23T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2011-03-10T00:00:00.000Z,
+      grade: 'B',
+      score: 14
+    }
+  ],
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+Type "it" for more
+ */
+
+// 7. Display the first 5 restaurants in the Bronx.
+db["restaurants"].find({borough: "Bronx"}).limit(5)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671b6'),
+  address: {
+    building: '1007',
+    coord: [
+      -73.856077,
+      40.848447
+    ],
+    street: 'Morris Park Ave',
+    zipcode: '10462'
+  },
+  borough: 'Bronx',
+  cuisine: 'Bakery',
+  grades: [
+    {
+      date: 2014-03-03T00:00:00.000Z,
+      grade: 'A',
+      score: 2
+    },
+    {
+      date: 2013-09-11T00:00:00.000Z,
+      grade: 'A',
+      score: 6
+    },
+    {
+      date: 2013-01-24T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2011-11-23T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2011-03-10T00:00:00.000Z,
+      grade: 'B',
+      score: 14
+    }
+  ],
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4671c0'),
+  address: {
+    building: '2300',
+    coord: [
+      -73.8786113,
+      40.8502883
+    ],
+    street: 'Southern Boulevard',
+    zipcode: '10460'
+  },
+  borough: 'Bronx',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-05-28T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2013-06-19T00:00:00.000Z,
+      grade: 'A',
+      score: 4
+    },
+    {
+      date: 2012-06-15T00:00:00.000Z,
+      grade: 'A',
+      score: 3
+    }
+  ],
+  name: 'Wild Asia',
+  restaurant_id: '40357217'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4671d5'),
+  address: {
+    building: '1006',
+    coord: [
+      -73.84856870000002,
+      40.8903781
+    ],
+    street: 'East 233 Street',
+    zipcode: '10466'
+  },
+  borough: 'Bronx',
+  cuisine: 'Ice Cream, Gelato, Yogurt, Ices',
+  grades: [
+    {
+      date: 2014-04-24T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2013-09-05T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2013-02-21T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2012-07-03T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2011-07-11T00:00:00.000Z,
+      grade: 'A',
+      score: 5
+    }
+  ],
+  name: 'Carvel Ice Cream',
+  restaurant_id: '40363093'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4671d9'),
+  address: {
+    building: '1236',
+    coord: [
+      -73.8893654,
+      40.81376179999999
+    ],
+    street: '238 Spofford Ave',
+    zipcode: '10474'
+  },
+  borough: 'Bronx',
+  cuisine: 'Chinese',
+  grades: [
+    {
+      date: 2013-12-30T00:00:00.000Z,
+      grade: 'A',
+      score: 8
+    },
+    {
+      date: 2013-01-08T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2012-06-12T00:00:00.000Z,
+      grade: 'B',
+      score: 15
+    }
+  ],
+  name: 'Happy Garden',
+  restaurant_id: '40363289'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4671eb'),
+  address: {
+    building: '277',
+    coord: [
+      -73.8941893,
+      40.8634684
+    ],
+    street: 'East Kingsbridge Road',
+    zipcode: '10458'
+  },
+  borough: 'Bronx',
+  cuisine: 'Chinese',
+  grades: [
+    {
+      date: 2014-03-03T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2013-09-26T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2013-03-19T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2012-08-29T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2011-08-17T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    }
+  ],
+  name: 'Happy Garden',
+  restaurant_id: '40364296'
+}
+ */
+
+// 8. Display the second 5 restaurants (skipping the first 5) in the Bronx. 
+db["restaurants"].find({borough: "Bronx"}).skip(5).limit(5)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671f3'),
+  address: {
+    building: '658',
+    coord: [
+      -73.81363999999999,
+      40.82941100000001
+    ],
+    street: 'Clarence Ave',
+    zipcode: '10465'
+  },
+  borough: 'Bronx',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-06-21T00:00:00.000Z,
+      grade: 'A',
+      score: 5
+    },
+    {
+      date: 2012-07-11T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    }
+  ],
+  name: 'Manhem Club',
+  restaurant_id: '40364363'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe46720b'),
+  address: {
+    building: '2222',
+    coord: [
+      -73.84971759999999,
+      40.8304811
+    ],
+    street: 'Haviland Avenue',
+    zipcode: '10462'
+  },
+  borough: 'Bronx',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-12-18T00:00:00.000Z,
+      grade: 'A',
+      score: 7
+    },
+    {
+      date: 2014-05-01T00:00:00.000Z,
+      grade: 'B',
+      score: 17
+    },
+    {
+      date: 2013-03-14T00:00:00.000Z,
+      grade: 'A',
+      score: 12
+    },
+    {
+      date: 2012-09-20T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2012-02-08T00:00:00.000Z,
+      grade: 'B',
+      score: 19
+    }
+  ],
+  name: 'The New Starling Athletic Club Of The Bronx',
+  restaurant_id: '40364956'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe467223'),
+  address: {
+    building: '72',
+    coord: [
+      -73.92506,
+      40.8275556
+    ],
+    street: 'East  161 Street',
+    zipcode: '10451'
+  },
+  borough: 'Bronx',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-04-15T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2013-11-14T00:00:00.000Z,
+      grade: 'A',
+      score: 4
+    },
+    {
+      date: 2013-07-29T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2012-12-31T00:00:00.000Z,
+      grade: 'B',
+      score: 15
+    },
+    {
+      date: 2012-05-30T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    },
+    {
+      date: 2012-01-09T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2011-08-15T00:00:00.000Z,
+      grade: 'C',
+      score: 37
+    }
+  ],
+  name: 'Yankee Tavern',
+  restaurant_id: '40365499'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe467236'),
+  address: {
+    building: '331',
+    coord: [
+      -73.87786539999999,
+      40.8724377
+    ],
+    street: 'East  204 Street',
+    zipcode: '10467'
+  },
+  borough: 'Bronx',
+  cuisine: 'Irish',
+  grades: [
+    {
+      date: 2014-08-26T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2014-03-26T00:00:00.000Z,
+      grade: 'B',
+      score: 23
+    },
+    {
+      date: 2013-09-11T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    },
+    {
+      date: 2012-12-18T00:00:00.000Z,
+      grade: 'B',
+      score: 27
+    },
+    {
+      date: 2011-10-20T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    }
+  ],
+  name: 'Mcdwyers Pub',
+  restaurant_id: '40365893'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe46724f'),
+  address: {
+    building: '5820',
+    coord: [
+      -73.9002615,
+      40.885186
+    ],
+    street: 'Broadway',
+    zipcode: '10463'
+  },
+  borough: 'Bronx',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-02-26T00:00:00.000Z,
+      grade: 'A',
+      score: 5
+    },
+    {
+      date: 2013-10-09T00:00:00.000Z,
+      grade: 'B',
+      score: 19
+    },
+    {
+      date: 2013-05-15T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2012-11-20T00:00:00.000Z,
+      grade: 'B',
+      score: 18
+    },
+    {
+      date: 2011-10-17T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2011-06-22T00:00:00.000Z,
+      grade: 'C',
+      score: 35
+    }
+  ],
+  name: 'The Punch Bowl',
+  restaurant_id: '40366497'
+}
+ */
+
+// 9. Find the restaurants with any score more than 85. 
+db["restaurants"].find({"grades.score": {$gt:85}})
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe467314'),
+  address: {
+    building: '65',
+    coord: [
+      -73.9782725,
+      40.7624022
+    ],
+    street: 'West   54 Street',
+    zipcode: '10019'
+  },
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-08-22T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2014-03-28T00:00:00.000Z,
+      grade: 'C',
+      score: 131
+    },
+    {
+      date: 2013-09-25T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2013-04-08T00:00:00.000Z,
+      grade: 'B',
+      score: 25
+    },
+    {
+      date: 2012-10-15T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2011-10-19T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    }
+  ],
+  name: "Murals On 54/Randolphs'S",
+  restaurant_id: '40372466'
+}
+Type "it" for more
+ */
+
+// 10.Find the restaurants that achieved score, more than 80 but less than 100. 
+db["restaurants"].find({
+    $and: [
+        {"grades.score": {$gt:80}},
+        {"grades.score": {$lt:100}}
+    ]
+})
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe467314'),
+  address: {
+    building: '65',
+    coord: [
+      -73.9782725,
+      40.7624022
+    ],
+    street: 'West   54 Street',
+    zipcode: '10019'
+  },
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-08-22T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2014-03-28T00:00:00.000Z,
+      grade: 'C',
+      score: 131
+    },
+    {
+      date: 2013-09-25T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2013-04-08T00:00:00.000Z,
+      grade: 'B',
+      score: 25
+    },
+    {
+      date: 2012-10-15T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2011-10-19T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    }
+  ],
+  name: "Murals On 54/Randolphs'S",
+  restaurant_id: '40372466'
+}
+Type "it" for more
+ */
+
+// 11.Find the restaurants which locate in longitude value less than -95.754168.
+db["restaurants"].find({"address.coord.0": {$lt: -95.754168}})
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4677fe'),
+  address: {
+    building: '3707',
+    coord: [
+      -101.8945214,
+      33.5197474
+    ],
+    street: '82 Street',
+    zipcode: '11372'
+  },
+  borough: 'Queens',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-06-04T00:00:00.000Z,
+      grade: 'A',
+      score: 12
+    },
+    {
+      date: 2013-11-07T00:00:00.000Z,
+      grade: 'B',
+      score: 19
+    },
+    {
+      date: 2013-05-17T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2012-08-29T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2012-04-03T00:00:00.000Z,
+      grade: 'A',
+      score: 12
+    },
+    {
+      date: 2011-11-16T00:00:00.000Z,
+      grade: 'A',
+      score: 7
+    }
+  ],
+  name: 'Burger King',
+  restaurant_id: '40534067'
+}
+Type "it" for more
+ */
+
+// 12.Find the restaurants that do not prepare any cuisine of 'American' and their grade score more than 70 and longitude less than -65.754168.
+db["restaurants"].find({
+  $and: [
+    {cuisine: {$ne: "American"}},
+    {"grades.score": {$gt: 70}},
+    {"address.coord.0": {$lt: -65.754168}}
+  ]
+})
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe467314'),
+  address: {
+    building: '65',
+    coord: [
+      -73.9782725,
+      40.7624022
+    ],
+    street: 'West   54 Street',
+    zipcode: '10019'
+  },
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-08-22T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2014-03-28T00:00:00.000Z,
+      grade: 'C',
+      score: 131
+    },
+    {
+      date: 2013-09-25T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2013-04-08T00:00:00.000Z,
+      grade: 'B',
+      score: 25
+    },
+    {
+      date: 2012-10-15T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2011-10-19T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    }
+  ],
+  name: "Murals On 54/Randolphs'S",
+  restaurant_id: '40372466'
+}
+Type "it" for more
+ */
+
+// 13.Find the restaurants which do not prepare any cuisine of 'American' and achieved a score more than 70 and located in the longitude less than -65.754168. (without using $and operator).
+db["restaurants"].find({
+  cuisine: {$ne: "American"},
+  "grades.score": {$gt: 70},
+  "address.coord.0": {$lt: -65.754168}
+})
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe467314'),
+  address: {
+    building: '65',
+    coord: [
+      -73.9782725,
+      40.7624022
+    ],
+    street: 'West   54 Street',
+    zipcode: '10019'
+  },
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  grades: [
+    {
+      date: 2014-08-22T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2014-03-28T00:00:00.000Z,
+      grade: 'C',
+      score: 131
+    },
+    {
+      date: 2013-09-25T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2013-04-08T00:00:00.000Z,
+      grade: 'B',
+      score: 25
+    },
+    {
+      date: 2012-10-15T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2011-10-19T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    }
+  ],
+  name: "Murals On 54/Randolphs'S",
+  restaurant_id: '40372466'
+}
+Type "it" for more
+ */
+
+// 14.Find the restaurants which do not prepare any cuisine of 'American ' and achieved a grade point 'A' and not in the borough of Brooklyn, sorted by cuisine in descending order. 
+db["restaurants"].find({
+  $and: [
+    {cuisine: {$ne: "American "}},
+    {"grades.grade": "A"},
+    {borough: {$ne: "Brooklyn"}}
+  ]
+}).sort({cuisine: -1})
+/**
+ * Result:
+{
+  _id: ObjectId('67458790c8b289cffe467d64'),
+  address: {
+    building: '148',
+    coord: [
+      -74.000254,
+      40.7172727
+    ],
+    street: 'Centre Street',
+    zipcode: '10013'
+  },
+  borough: 'Manhattan',
+  cuisine: 'Vietnamese/Cambodian/Malaysia',
+  grades: [
+    {
+      date: 2014-10-01T00:00:00.000Z,
+      grade: 'A',
+      score: 7
+    },
+    {
+      date: 2014-05-19T00:00:00.000Z,
+      grade: 'C',
+      score: 5
+    },
+    {
+      date: 2013-11-15T00:00:00.000Z,
+      grade: 'B',
+      score: 14
+    },
+    {
+      date: 2013-03-08T00:00:00.000Z,
+      grade: 'B',
+      score: 25
+    },
+    {
+      date: 2012-05-22T00:00:00.000Z,
+      grade: 'B',
+      score: 23
+    },
+    {
+      date: 2011-10-27T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    }
+  ],
+  name: 'Nha-Trang Centre Vietnam Restaurant',
+  restaurant_id: '40751226'
+}
+Type "it" for more
+ */
+
+// 15.Find the restaurant Id, name, borough and cuisine for those restaurants which contain 'Wil' as first three letters for its name.
+db["restaurants"].find(
+  {name: {$regex: "^Wil"}},
+  {restaurant_id: true, name: true, borough: true, cuisine: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671bd'),
+  borough: 'Brooklyn',
+  cuisine: 'Delicatessen',
+  name: "Wilken'S Fine Food",
+  restaurant_id: '40356483'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4671c0'),
+  borough: 'Bronx',
+  cuisine: 'American ',
+  name: 'Wild Asia',
+  restaurant_id: '40357217'
+}
+{
+  _id: ObjectId('67458790c8b289cffe467fc5'),
+  borough: 'Bronx',
+  cuisine: 'Pizza',
+  name: 'Wilbel Pizza',
+  restaurant_id: '40871979'
+}
+ */
+
+// 16.Find the restaurant Id, name, borough and cuisine for those restaurants which contain 'ces' as last three letters for its name.
+db["restaurants"].find(
+  {name: {$regex: "ces$"}},
+  {restaurant_id: true, name: true, borough: true, cuisine: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe467649'),
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  name: 'Pieces',
+  restaurant_id: '40399910'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe467708'),
+  borough: 'Queens',
+  cuisine: 'American ',
+  name: 'S.M.R Restaurant Services',
+  restaurant_id: '40403857'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe46770e'),
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  name: 'Good Shepherd Services',
+  restaurant_id: '40403989'
+}
+{
+  _id: ObjectId('67458790c8b289cffe467bc1'),
+  borough: 'Queens',
+  cuisine: 'Ice Cream, Gelato, Yogurt, Ices',
+  name: "The Ice Box-Ralph'S Famous Italian Ices",
+  restaurant_id: '40690899'
+}
+{
+  _id: ObjectId('67458790c8b289cffe467dc3'),
+  borough: 'Brooklyn',
+  cuisine: 'Jewish/Kosher',
+  name: 'Alices',
+  restaurant_id: '40782042'
+}
+{
+  _id: ObjectId('67458790c8b289cffe467fdf'),
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  name: 'Re: Sources',
+  restaurant_id: '40876068'
+}
+ */
+
+// 17.Find the restaurant Id, name, borough and cuisine for those restaurants which contain 'Reg' as three letters somewhere in its name.
+db["restaurants"].find(
+  {name: {$regex: "Reg"}},
+  {restaurant_id: true, name: true, borough: true, cuisine: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671be'),
+  borough: 'Brooklyn',
+  cuisine: 'American ',
+  name: 'Regina Caterers',
+  restaurant_id: '40356649'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4672bb'),
+  borough: 'Manhattan',
+  cuisine: 'Café/Coffee/Tea',
+  name: 'Caffe Reggio',
+  restaurant_id: '40369418'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4673ca'),
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  name: 'Regency Hotel',
+  restaurant_id: '40382679'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4676e7'),
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  name: 'Regency Whist Club',
+  restaurant_id: '40402377'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4677ca'),
+  borough: 'Queens',
+  cuisine: 'American ',
+  name: 'Rego Park Cafe',
+  restaurant_id: '40523342'
+}
+{
+  _id: ObjectId('67458790c8b289cffe467e38'),
+  borough: 'Queens',
+  cuisine: 'Pizza',
+  name: 'Regina Pizza',
+  restaurant_id: '40801325'
+}
+{
+  _id: ObjectId('67458790c8b289cffe46804f'),
+  borough: 'Manhattan',
+  cuisine: 'American ',
+  name: 'Regal Entertainment Group',
+  restaurant_id: '40891782'
+}
+ */
+
+// 18.Find the restaurants which belong to the borough Bronx and prepared either American or Chinese dish.
+db["restaurants"].find({
+  borough: "Bronx",
+  cuisine: {$in: ["American", "Chinese"]}
+})
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671d9'),
+  address: {
+    building: '1236',
+    coord: [
+      -73.8893654,
+      40.81376179999999
+    ],
+    street: '238 Spofford Ave',
+    zipcode: '10474'
+  },
+  borough: 'Bronx',
+  cuisine: 'Chinese',
+  grades: [
+    {
+      date: 2013-12-30T00:00:00.000Z,
+      grade: 'A',
+      score: 8
+    },
+    {
+      date: 2013-01-08T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2012-06-12T00:00:00.000Z,
+      grade: 'B',
+      score: 15
+    }
+  ],
+  name: 'Happy Garden',
+  restaurant_id: '40363289'
+}
+Type "it" for more
+ */
+
+// 19.Find the restaurant Id, name, borough and cuisine for those restaurants which belong to the boroughs of Staten Island or Queens or Bronx or Brooklyn.
+db["restaurants"].find(
+  {borough: {$in: ["Staten Island", "Queens", "Bronx", "Brooklyn"]}},
+  {restaurant_id: true, name: true, borough: true, cuisine: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671b6'),
+  borough: 'Bronx',
+  cuisine: 'Bakery',
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+Type "it" for more
+ */
+
+// 20.Find the restaurant Id, name, borough and cuisine for those restaurants which are not belonging to the borough Staten Island or Queens or Bronx or Brooklyn.
+db["restaurants"].find(
+  {borough: {$nin:["Staten Island", "Queens", "Bronx", "Brooklyn"]}},
+  {restaurant_id: true, name: true, borough: true, cuisine: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671b8'),
+  borough: 'Manhattan',
+  cuisine: 'Irish',
+  name: 'Dj Reynolds Pub And Restaurant',
+  restaurant_id: '30191841'
+}
+Type "it" for more
+ */
+
+// 21.Find the restaurant Id, name, borough and cuisine for those restaurants which achieved a score below 10.
+db["restaurants"].find(
+  {"grades.score": {$lt: 10}},
+  {restaurant_id: true, name: true, borough: true, cuisine: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671b6'),
+  borough: 'Bronx',
+  cuisine: 'Bakery',
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+Type "it" for more
+ */
+
+// 22.Find the restaurant Id, name, borough and cuisine for those restaurants which prepared dish except 'American' and 'Chinese' or restaurant's name begins with letter 'Wil'.
+db["restaurants"].find(
+  {
+    $or: [
+      {cuisine: {$nin: ["American", "Chinese"]}},
+      {name: {$regex: "^Wil"} }
+    ]
+  },
+  {restaurant_id: true, name: true, borough: true, cuisine: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4671b6'),
+  borough: 'Bronx',
+  cuisine: 'Bakery',
+  name: 'Morris Park Bake Shop',
+  restaurant_id: '30075445'
+}
+Type "it" for more
+ */
+
+// 23.Find the restaurant Id, name, and grades for those restaurants which achieved a grade of "A" and scored 11 on an ISODate "2014-08-11T00:00:00Z" among many of survey dates.
+db["restaurants"].find(
+  {
+    "grades.grade": "A",
+    "grades.score": 11,
+    "grades.date": ISODate("2014-08-11T00:00:00Z")
+  },
+  {restaurant_id: true, name: true, grades: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe467234'),
+  grades: [
+    {
+      date: 2014-08-11T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    },
+    {
+      date: 2013-07-22T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2013-03-14T00:00:00.000Z,
+      grade: 'A',
+      score: 12
+    },
+    {
+      date: 2012-07-02T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    },
+    {
+      date: 2012-02-02T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2011-08-24T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    }
+  ],
+  name: "Neary'S Pub",
+  restaurant_id: '40365871'
+}
+Type "it" for more
+ */
+
+// 24.Find the restaurant Id, name and grades for those restaurants where the 2nd element of grades array contains a grade of "A" and score 9 on an ISODate "2014-08-11T00:00:00Z".
+db["restaurants"].find(
+  {
+    "grades.1.grade": "A",
+    "grades.1.score": 9,
+    "grades.1.date": ISODate("2014-08-11T00:00:00Z")
+  },
+  {restaurant_id: true, name: true, grades: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe4677e1'),
+  grades: [
+    {
+      date: 2015-01-12T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2014-08-11T00:00:00.000Z,
+      grade: 'A',
+      score: 9
+    },
+    {
+      date: 2014-01-14T00:00:00.000Z,
+      grade: 'A',
+      score: 13
+    },
+    {
+      date: 2013-02-07T00:00:00.000Z,
+      grade: 'A',
+      score: 10
+    },
+    {
+      date: 2012-04-30T00:00:00.000Z,
+      grade: 'A',
+      score: 11
+    }
+  ],
+  name: 'Club Macanudo (Cigar Bar)',
+  restaurant_id: '40526406'
+}
+ */
+
+// 25.Find the restaurant Id, name, address and geographical location for those restaurants where 2nd element of coordinates contains a value which is more than 42 and up to 52.
+db["restaurants"].find(
+  {"address.coord.1": {$gt: 42, $lte: 52}},
+  {restaurant_id: true, name: true, address: true}
+)
+/**
+ * Result:
+{
+  _id: ObjectId('6745878fc8b289cffe467458'),
+  address: {
+    building: '47',
+    coord: [
+      -78.877224,
+      42.89546199999999
+    ],
+    street: 'Broadway @ Trinity Pl',
+    zipcode: '10006'
+  },
+  name: "T.G.I. Friday'S",
+  restaurant_id: '40387990'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe467484'),
+  address: {
+    building: '1',
+    coord: [
+      -0.7119979,
+      51.6514664
+    ],
+    street: 'Pennplaza E, Penn Sta',
+    zipcode: '10001'
+  },
+  name: 'T.G.I. Fridays',
+  restaurant_id: '40388936'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe4676dd'),
+  address: {
+    building: '3000',
+    coord: [
+      -87.86567699999999,
+      42.61150920000001
+    ],
+    street: '47 Avenue',
+    zipcode: '11101'
+  },
+  name: "Di Luvio'S Deli",
+  restaurant_id: '40402284'
+}
+{
+  _id: ObjectId('6745878fc8b289cffe467912'),
+  address: {
+    building: '21972199',
+    coord: [
+      -78.589606,
+      42.8912372
+    ],
+    street: 'Broadway',
+    zipcode: '10024'
+  },
+  name: 'La Caridad 78',
+  restaurant_id: '40568285'
+}
+{
+  _id: ObjectId('67458790c8b289cffe467fe4'),
+  address: {
+    building: '7981',
+    coord: [
+      -84.9751215,
+      45.4713351
+    ],
+    street: 'Hoyt Street',
+    zipcode: '11201'
+  },
+  name: "Bijan'S",
+  restaurant_id: '40876618'
+}
+{
+  _id: ObjectId('67458790c8b289cffe467ff9'),
+  address: {
+    building: '0',
+    coord: [
+      -88.0778799,
+      42.4154769
+    ],
+    street: '& Grand Central',
+    zipcode: '10017'
+  },
+  name: 'Hyatt, Ny Central/Room Service',
+  restaurant_id: '40879243'
+}
+{
+  _id: ObjectId('67458790c8b289cffe46800f'),
+  address: {
+    building: '60',
+    coord: [
+      -111.9975205,
+      42.0970258
+    ],
+    street: 'West Side Highway',
+    zipcode: '10006'
+  },
+  name: 'Sports Center At Chelsea Piers (Sushi Bar)',
+  restaurant_id: '40882356'
+}
+ */
+
+/***********************************************************************************/
+
+/**
+ * Q2. 
+ * Restaurant foreclosures in North Carolina
+ * Some Background: geospatial logic is possible in MongoDB using the geopastial library/facilities. https://docs.mongodb.com/manual/geospatial-queries/
+ * Use the dataset from Homework 2, Question 7, use MongoDB to solve the following:
+ * Find the number of foreclosures within the polygon defined as all restaurants where Rpt_Area_Desc="Food Service" and Seats>=100 .
+ * 
+ * Update on Nov 28th, 2024
+ * Dataset = Restaurants_in_Durham_Count_NC.csv
+ * Filter for rpt_area_desc should be 'Food Service"
+ * What to do: repeat HW2, Q7 but in MongoDB
+ * Find the number of foreclosures (restaurants where Rpt_Area_Desc="Food Service" and Seats>=100) within this point: 35.994914, -78.897133 
+ * 
+ * Answer: 
+ * Enter the following command to get the result.
+ */
+
+/** Part (a) */
+
+// Converting geolocation fields to arrays.
+db["durham_restaurants"].updateMany(
+  {"geolocation": {$type: "string"}},
+  [{
+    $set: {
+      geolocation: {
+        $map: {
+          input: {$split: ["$geolocation", ", "]},
+          as: "coord",
+          in: {$toDouble: "$$coord"}
+        }
+      }
+    }
+  }]
+)
+
+// Modify the order of latitude and longitude.
+db["durham_restaurants"].updateMany(
+  {"geolocation": {$type: "array"}},
+  [{
+    $set: {
+      geolocation: [
+        { $arrayElemAt: ["$geolocation", 1] },
+        { $arrayElemAt: ["$geolocation", 0] }
+      ]
+    }
+  }]
+)
+
+// Create an index for the "durham_restaurants" collection to be used for calculations.
+db["durham_restaurants"].createIndex({"geolocation": "2dsphere"})
+
+// Query by aggregate.
+db["durham_restaurants"].aggregate([
+  {
+    $geoNear: {
+    near: { type: "Point", coordinates: [-78.897133, 35.994914]},
+    distanceField: "distance",
+    spherical: true,
+    }
+  },
+  {
+    $match: {
+      Rpt_Area_Desc: "Food Service",
+      Seats: {$gte: 100}
+    }
+  },
+  {$sort: {distance: 1}},
+  {$limit: 1}
+])
+
+/**
+ * Result:
+ * 
+{
+  _id: ObjectId('67495680acc9835b353eec7e'),
+  ID: 152033,
+  Premise_Name: 'POMPIERI PIZZA',
+  Premise_Address1: '102 CITY HALL PLAZA SUITE 101',
+  Premise_City: 'DURHAM',
+  Premise_State: 'NC',
+  Premise_Zip: 27701,
+  Premise_Phone: '(919) 973-1589',
+  Opening_Date: 2013-12-19T00:00:00.000Z,
+  Seats: 105,
+  Water: '5 - Municipal/Community',
+  Sewage: '3 - Municipal/Community',
+  Insp_Freq: 4,
+  Est_Group_Desc: 'Full-Service Restaurant',
+  Risk: 4,
+  Smoking_Allowed: 'N/A',
+  Type_Description: '1 - Restaurant',
+  Rpt_Area_Desc: 'Food Service',
+  Status: 'ACTIVE',
+  Transitional_Type_Desc: 'FOOD',
+  geolocation: [
+    -78.8996129,
+    35.9958445
+  ],
+  distance: 246.20010146126216
+}
+ */
+
+/** Part (b) */
+
+// With part (a), we can get the center point [-78.8996129, 35.9958445]
+var center_coord = [-78.8996129, 35.9958445]
+
+// Create an index for "durham_foreclosure" collection to be used in calculations
+db["durham_foreclosure"].createIndex({"geometry": "2dsphere"})
+
+// Find foreclosure records within 1 mile (1609.34 meters)
+db["durham_foreclosure"].aggregate([
+  {
+    $geoNear: {
+      near: {type: "Point", coordinates: center_coord},
+      distanceField: "distance",
+      spherical: true,
+      maxDistance: 1609.34
+    }
+  },
+  {
+    $count: "foreclosures_within_1_mile"
+  }
+])
+
+/**
+ * Result:
+ * 
+{
+  foreclosures_within_1_mile: 253
+}
+ */
+
+/***********************************************************************************/
+
+/**
+ * Q3. Extra Credit
+ * Dataset: meteorites.json, worldcities.csv
+ * Use the MongoDB geospatial facilities to find the nearest city to each meteorite "fallen" (not found) since the year 1950, inclusive. Distance is between coordinates should be a straight line.
+ * Note: 'worldcities' is a CSV file. You will need to import into MongoDB AND clean-up the double quotes.
+ * Note: Use the $near operator and select this closest entry per city
+ * 
+ * Answer: 
+ * Enter the following command to get the result.
+ */
+
+// Modify the "worldcities" structure and create geolocation.
+db["worldcities"].updateMany(
+  {lat: {$exists: true}, lng: {$exists: true}},
+  [{
+    $set: {
+      geolocation: {
+        type: "Point",
+        coordinates: ["$lng", "$lat"]
+      }
+    }
+  }]
+);
+
+// Create an index for "worldcities" collection.
+db["worldcities"].createIndex({"geolocation.coordinates": "2dsphere"})
+
+// Create an index for "meteorites" collection.
+db["meteorites"].createIndex({"geolocation.coordinates": "2dsphere"})
+
+// Find each meteorite "fallen" (not found) since the year 1950, inclusive.
+var recentMeteorites = db["meteorites"].find({
+  fall: "Fell",
+  year: {$gte: "1950"},
+  "geolocation.coordinates": {$exists: true}
+}).toArray();
+
+// Query the nearest city for each meteorite of recentMeteorites.
+recentMeteorites.forEach(function(meteorite){
+  var nearestCity = db["worldcities"].aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: "Point",
+          coordinates: meteorite.geolocation.coordinates
+        },
+        distanceField: "distance",
+        spherical: true
+      }
+    },
+    {$sort: {distance: 1}},
+    {$limit: 1}
+  ]).toArray();
+  print("Meteorite: " + meteorite.name + " | Nearest City: " + nearestCity[0].city + " | Distance: " + nearestCity[0].distance + " meters");
+});
+
+/**
+ * Result:
+ * 
+Meteorite: Aarhus | Nearest City: Århus | Distance: 3229.2152400476843 meters
+Meteorite: Abee | Nearest City: Athabasca | Distance: 58305.54962453523 meters
+Meteorite: Acapulco | Nearest City: Acapulco | Distance: 4083.046687676021 meters
+Meteorite: Aioun el Atrouss | Nearest City: Ayoun el Atrous | Distance: 30301.23968448802 meters
+Meteorite: Akwanga | Nearest City: Lafia | Distance: 48400.758000064656 meters
+Meteorite: Akyumak | Nearest City: Ağrı | Distance: 29710.865322399357 meters
+Meteorite: Al Rais | Nearest City: Medina | Distance: 11279.547203542796 meters
+Meteorite: Al Zarnkh | Nearest City: En Nuhud | Distance: 122814.8527135573 meters
+Meteorite: Alby sur Chéran | Nearest City: Annecy | Distance: 11766.443083671133 meters
+Meteorite: Allende | Nearest City: Hidalgo del Parral | Distance: 34920.44151402413 meters
+Meteorite: Almahata Sitta | Nearest City: Wadi Halfa | Distance: 161015.21447026366 meters
+Meteorite: Alta'ameem | Nearest City: Kirkuk | Distance: 27339.63662203512 meters
+Meteorite: Andreevka | Nearest City: Kramatorsk | Distance: 3324.010391669049 meters
+Meteorite: Anlong | Nearest City: Xingyi | Distance: 30300.075450331322 meters
+Meteorite: Aomori | Nearest City: Aomori | Distance: 6565.3909486648745 meters
+Meteorite: Arbol Solo | Nearest City: San Luis | Distance: 46683.46249510001 meters
+Meteorite: Arroyo Aguiar | Nearest City: Santa Fe | Distance: 23174.593315606948 meters
+Meteorite: Ash Creek | Nearest City: Lacy-Lakeview | Distance: 21546.382554022774 meters
+Meteorite: Avanhandava | Nearest City: Penápolis | Distance: 14507.653405699639 meters
+Meteorite: Awere | Nearest City: Kole | Distance: 35420.051588751696 meters
+Meteorite: Ban Rong Du | Nearest City: Phetchabun | Distance: 27692.31320966401 meters
+Meteorite: Barwell | Nearest City: Leicester | Distance: 15713.062811708513 meters
+Meteorite: Bassikounou | Nearest City: Sokolo | Distance: 119499.65225725604 meters
+Meteorite: Baszkówka | Nearest City: Warsaw | Distance: 24514.62579331781 meters
+Meteorite: Battle Mountain | Nearest City: Winnemucca | Distance: 55921.99474873244 meters
+Meteorite: Bawku | Nearest City: Bawku | Distance: 6696.58123815583 meters
+Meteorite: Bells | Nearest City: Sherman | Distance: 14474.30303918002 meters
+Meteorite: Benguerir | Nearest City: Marrakesh | Distance: 70457.22230398892 meters
+Meteorite: Beni M'hira | Nearest City: Tataouine | Distance: 34496.48131385702 meters
+Meteorite: Bensour | Nearest City: Marrakesh | Distance: 205091.91445369934 meters
+Meteorite: Berduc | Nearest City: Paysandú | Distance: 52288.338363182935 meters
+Meteorite: Berthoud | Nearest City: Berthoud | Distance: 1523.8310874697358 meters
+Meteorite: Bhawad | Nearest City: Jodhpur | Distance: 26027.232928945064 meters
+Meteorite: Bilanga | Nearest City: Koupéla | Distance: 42461.445730872896 meters
+Meteorite: Binningup | Nearest City: Bunbury | Distance: 21059.535406269195 meters
+Meteorite: Bo Xian | Nearest City: Shangqiu | Distance: 70737.65628068436 meters
+Meteorite: Bogou | Nearest City: Fada Ngourma | Distance: 61754.252173856556 meters
+Meteorite: Boumdeid (2003) | Nearest City: Tidjikdja | Distance: 93554.98641630662 meters
+Meteorite: Boumdeid (2011) | Nearest City: Kiffa | Distance: 62089.440436619996 meters
+Meteorite: Bovedy | Nearest City: Craigavon | Distance: 13176.870563195565 meters
+Meteorite: Breitscheid | Nearest City: Gießen | Distance: 34214.7777000557 meters
+Meteorite: Bruderheim | Nearest City: Edmonton | Distance: 56281.466755214 meters
+Meteorite: Bukhara | Nearest City: Kogon | Distance: 8029.098871705781 meters
+Meteorite: Bunburra Rockhole | Nearest City: Ceduna | Distance: 431562.132901894 meters
+Meteorite: Burnwell | Nearest City: Pikeville | Distance: 29947.32708040969 meters
+Meteorite: Buzzard Coulee | Nearest City: North Battleford | Distance: 108178.6346264456 meters
+Meteorite: Cali | Nearest City: Cali | Distance: 1242.827711741688 meters
+Meteorite: Campos Sales | Nearest City: Crato | Distance: 85320.26299796389 meters
+Meteorite: Çanakkale | Nearest City: Çanakkale | Distance: 41897.72021380901 meters
+Meteorite: Canon City | Nearest City: Cañon City | Distance: 3558.9763260840054 meters
+Meteorite: Carancas | Nearest City: Desaguadero | Distance: 11114.704190680402 meters
+Meteorite: Ceniceros | Nearest City: Hidalgo del Parral | Distance: 67498.07635519997 meters
+Meteorite: Centerville | Nearest City: Tea | Distance: 28774.72165165676 meters
+Meteorite: Chadong | Nearest City: Tongren | Distance: 96700.15537157324 meters
+Meteorite: Changde | Nearest City: Changde | Distance: 9035.55133991484 meters
+Meteorite: Chela | Nearest City: Kahama | Distance: 19203.808998786993 meters
+Meteorite: Chelyabinsk | Nearest City: Yemanzhelinsk | Distance: 13629.82895773152 meters
+Meteorite: Chergach  | Nearest City: Taoudenni | Distance: 155815.8561878907 meters
+Meteorite: Chernyi Bor | Nearest City: Mahilyow | Distance: 26580.379107484427 meters
+Meteorite: Chiang Khan | Nearest City: Loei | Distance: 46606.91070649663 meters
+Meteorite: Chisenga | Nearest City: Chitipa | Distance: 40721.10532655063 meters
+Meteorite: Chitado | Nearest City: Chitado | Distance: 6003.879098363133 meters
+Meteorite: Chitenay | Nearest City: Tours | Distance: 23147.70308411927 meters
+Meteorite: Cilimus | Nearest City: Tasikmalaya | Distance: 43667.37388536063 meters
+Meteorite: Claxton | Nearest City: Statesboro | Distance: 38421.52697095735 meters
+Meteorite: Coleman | Nearest City: Clare | Distance: 21673.09815637295 meters
+Meteorite: Conquista | Nearest City: Uberaba | Distance: 42609.71601698207 meters
+Meteorite: Dahmani | Nearest City: Qasserine | Distance: 48566.01252111755 meters
+Meteorite: Dashoguz | Nearest City: Daşoguz | Distance: 28223.168777469284 meters
+Meteorite: Daule | Nearest City: Guayaquil | Distance: 39086.50901339157 meters
+Meteorite: Denver | Nearest City: Denver | Distance: 5198.850111245786 meters
+Meteorite: Dergaon | Nearest City: Jorhat | Distance: 35587.526952029475 meters
+Meteorite: Desuri | Nearest City: Pali | Distance: 29443.574424442013 meters
+Meteorite: Devgaon | Nearest City: Warangal | Distance: 186049.35354000572 meters
+Meteorite: Devri-Khera | Nearest City: Kota | Distance: 127164.92690127519 meters
+Meteorite: Dhajala | Nearest City: Rajkot | Distance: 65018.359639239934 meters
+Meteorite: Didim | Nearest City: Söke | Distance: 45031.21061872445 meters
+Meteorite: Distrito Quebracho | Nearest City: Paraná | Distance: 17851.041448877895 meters
+Meteorite: Djermaia | Nearest City: Ndjamena | Distance: 69043.35657205743 meters
+Meteorite: Djoumine | Nearest City: Béja | Distance: 40326.35853705573 meters
+Meteorite: Dong Ujimqin Qi | Nearest City: Bairin Zuoqi | Distance: 169209.22311482037 meters
+Meteorite: Dongtai | Nearest City: Yancheng | Distance: 80535.68502531476 meters
+Meteorite: Dosso | Nearest City: Dosso | Distance: 3614.4337274846016 meters
+Meteorite: Dowa | Nearest City: Dowa | Distance: 2797.21070846646 meters
+Meteorite: Dubrovnik | Nearest City: Herceg-Novi | Distance: 7892.113481413612 meters
+Meteorite: Dunbogan | Nearest City: Port Macquarie | Distance: 25970.85867479537 meters
+Meteorite: Dunhua | Nearest City: Dunhua | Distance: 3090.6559825404433 meters
+Meteorite: Dwaleni | Nearest City: Nhlangano | Distance: 15263.873239827391 meters
+Meteorite: Ehole | Nearest City: Oshikango | Distance: 12135.618100717997 meters
+Meteorite: El Idrissia | Nearest City: Djelfa | Distance: 29313.591459497587 meters
+Meteorite: El Paso de Aguila | Nearest City: Matamoros | Distance: 58252.72709669792 meters
+Meteorite: El Tigre | Nearest City: Ciudad Guzman | Distance: 51434.35220354782 meters
+Meteorite: Elbert | Nearest City: Castle Rock | Distance: 27022.668308446104 meters
+Meteorite: Elenovka | Nearest City: Donetsk | Distance: 22197.308870251618 meters
+Meteorite: Enshi | Nearest City: Fengjie | Distance: 83548.96150330307 meters
+Meteorite: Essebi | Nearest City: Arua | Distance: 16963.357215874046 meters
+Meteorite: Fermo | Nearest City: Ancona | Distance: 50978.66746972944 meters
+Meteorite: Fuyang | Nearest City: Fuyang | Distance: 7477.3566032745275 meters
+Meteorite: Galim (a) | Nearest City: Tibati | Distance: 68560.37421857672 meters
+Meteorite: Galim (b) | Nearest City: Tibati | Distance: 68560.37421857672 meters
+Meteorite: Galkiv | Nearest City: Chernihiv | Distance: 40970.348726424636 meters
+Meteorite: Gao-Guenie | Nearest City: Sapouy | Distance: 45928.6631036595 meters
+Meteorite: Garland | Nearest City: Tremonton | Distance: 6082.677592964475 meters
+Meteorite: Gashua | Nearest City: Gashua | Distance: 2394.0927603859004 meters
+Meteorite: Gasseltepaoua | Nearest City: Djibo | Distance: 45135.24569320399 meters
+Meteorite: Geidam | Nearest City: Diffa | Distance: 87287.44447719294 meters
+Meteorite: Glanerbrug | Nearest City: Münster | Distance: 57520.82702241925 meters
+Meteorite: Glatton | Nearest City: Peterborough | Distance: 13854.29600857824 meters
+Meteorite: Gorlovka | Nearest City: Horlivka | Distance: 2788.680302479844 meters
+Meteorite: Granes | Nearest City: Perpignan | Distance: 57569.70531724292 meters
+Meteorite: Grefsheim | Nearest City: Hamar | Distance: 17476.436847906374 meters
+Meteorite: Grimsby | Nearest City: Hamilton | Distance: 18177.31264723529 meters
+Meteorite: Guangmingshan | Nearest City: Zhuanghe | Distance: 21709.55344210933 meters
+Meteorite: Guangnan | Nearest City: Xingyi | Distance: 110810.94716283714 meters
+Meteorite: Guangrao | Nearest City: Buizhou | Distance: 45169.41310183405 meters
+Meteorite: Guibga | Nearest City: Kaya | Distance: 63403.448585453996 meters
+Meteorite: Gujargaon | Nearest City: Ujjain | Distance: 35216.80273468814 meters
+Meteorite: Gujba | Nearest City: Damaturu | Distance: 44113.56318030857 meters
+Meteorite: Gursum | Nearest City: Harar | Distance: 29748.72093559409 meters
+Meteorite: Hamlet | Nearest City: Plymouth | Distance: 23816.231657901742 meters
+Meteorite: Harleton | Nearest City: Marshall | Distance: 21484.581596649303 meters
+Meteorite: Haverö | Nearest City: Turku | Distance: 25512.94828075214 meters
+Meteorite: Hiroshima | Nearest City: Hiroshima | Distance: 8824.19932540379 meters
+Meteorite: Hoima | Nearest City: Hoima | Distance: 17560.880403871586 meters
+Meteorite: Hökmark | Nearest City: Skellefteå | Distance: 39555.23835167316 meters
+Meteorite: Hotse | Nearest City: Puyang | Distance: 47167.44066881898 meters
+Meteorite: Hoxie | Nearest City: Colby | Distance: 51398.06814384922 meters
+Meteorite: Huaxi | Nearest City: Guiyang | Distance: 15520.326679646694 meters
+Meteorite: Ibitira | Nearest City: Divinópolis | Distance: 19654.02411001637 meters
+Meteorite: Idutywa | Nearest City: Umtata | Distance: 72220.50737751088 meters
+Meteorite: Iguaracu | Nearest City: Maringá | Distance: 25329.052836500134 meters
+Meteorite: Ijopega | Nearest City: Goroka | Distance: 5940.318507720533 meters
+Meteorite: Inner Mongolia | Nearest City: Hohhot | Distance: 34923.56618059051 meters
+Meteorite: Innisfree | Nearest City: Vegreville | Distance: 48163.82468225671 meters
+Meteorite: Ipiranga | Nearest City: Foz do Iguaçu | Distance: 3990.9019949754206 meters
+Meteorite: Ishinga | Nearest City: Tukuyu | Distance: 39355.18357378964 meters
+Meteorite: Itqiy | Nearest City: Bir Mogrein | Distance: 204012.3556792961 meters
+Meteorite: Jartai | Nearest City: Wuhai | Distance: 86804.27667922358 meters
+Meteorite: Jesenice | Nearest City: Jesenice | Distance: 1527.4695054525268 meters
+Meteorite: Jiange | Nearest City: Mianyang | Distance: 51627.02520669567 meters
+Meteorite: Jilin | Nearest City: Jiutai | Distance: 27844.43007491732 meters
+Meteorite: Jodiya | Nearest City: Rajkot | Distance: 64821.17658491254 meters
+Meteorite: Jolomba | Nearest City: Calucinga | Distance: 71309.08610953913 meters
+Meteorite: Juancheng | Nearest City: Heze | Distance: 30207.99441597388 meters
+Meteorite: Jumapalo | Nearest City: Madiun | Distance: 35932.08406781739 meters
+Meteorite: Junan | Nearest City: Linyi | Distance: 44821.29375922869 meters
+Meteorite: Juromenha | Nearest City: Badajoz | Distance: 30339.381176063416 meters
+Meteorite: Kabo | Nearest City: Kano | Distance: 37017.585891659146 meters
+Meteorite: Kaidun | Nearest City: Al Mukalla | Distance: 102526.20830656706 meters
+Meteorite: Kalaba | Nearest City: Moba | Distance: 35006.21107093414 meters
+Meteorite: Kandahar (Afghanistan) | Nearest City: Kandahar | Distance: 8457.466154727603 meters
+Meteorite: Kaprada | Nearest City: Silvassa | Distance: 23041.184330067186 meters
+Meteorite: Karatu | Nearest City: Oldeani | Distance: 17147.107643168398 meters
+Meteorite: Karloowala | Nearest City: Dera Ismail Khan | Distance: 71835.18278231667 meters
+Meteorite: Kasauli | Nearest City: Muzaffarnagar | Distance: 15388.119401732158 meters
+Meteorite: Katagum | Nearest City: Azare | Distance: 40349.547512829806 meters
+Meteorite: Kavarpura | Nearest City: Kota | Distance: 4629.296787970595 meters
+Meteorite: Kayakent | Nearest City: Polatlı | Distance: 47674.46275328811 meters
+Meteorite: Kemer | Nearest City: Rodos | Distance: 107595.23871221022 meters
+Meteorite: Kendrapara | Nearest City: Cuttack | Distance: 84781.07726243415 meters
+Meteorite: Kidairat | Nearest City: En Nuhud | Distance: 152715.7272134215 meters
+Meteorite: Kiel | Nearest City: Kiel | Distance: 7855.6225205188875 meters
+Meteorite: Kiffa | Nearest City: Kiffa | Distance: 8200.448078423655 meters
+Meteorite: Kilabo | Nearest City: Nguru | Distance: 71679.41515012928 meters
+Meteorite: Kingai | Nearest City: Niyala | Distance: 52563.17801946379 meters
+Meteorite: Kitchener | Nearest City: Kitchener | Distance: 12003.245389530462 meters
+Meteorite: Kobe | Nearest City: Kōbe | Distance: 5944.450203036314 meters
+Meteorite: Kokubunji | Nearest City: Takamatsu | Distance: 10035.9513591946 meters
+Meteorite: Košice | Nearest City: Košice | Distance: 6554.217760734111 meters
+Meteorite: Kulak | Nearest City: Chaman | Distance: 40291.244272366195 meters
+Meteorite: Kunya-Urgench | Nearest City: Koneurgench | Distance: 7915.257914534659 meters
+Meteorite: Kutais | Nearest City: Apsheronsk | Distance: 34458.518655022395 meters
+Meteorite: La Criolla | Nearest City: Concordia | Distance: 21715.531616110657 meters
+Meteorite: Lahrauli | Nearest City: Faizabad | Distance: 54457.35083016155 meters
+Meteorite: Lanxi | Nearest City: Lanxi | Distance: 6737.440086291743 meters
+Meteorite: Laochenzhen | Nearest City: Jieshou | Distance: 21482.66838259677 meters
+Meteorite: Leighlinbridge | Nearest City: Kilkenny | Distance: 19332.915663654323 meters
+Meteorite: Lichtenberg | Nearest City: Mahikeng | Distance: 62565.20284718684 meters
+Meteorite: Lishui | Nearest City: Maanshan | Distance: 48889.41749479863 meters
+Meteorite: Lohawat | Nearest City: Jodhpur | Distance: 84453.94659759394 meters
+Meteorite: Lorton | Nearest City: Alexandria | Distance: 17044.631660346124 meters
+Meteorite: Lost City | Nearest City: Tahlequah | Distance: 18923.351477681084 meters
+Meteorite: Louisville | Nearest City: Shively | Distance: 8108.2899290271525 meters
+Meteorite: Lunan | Nearest City: Kunming | Distance: 69427.27195785001 meters
+Meteorite: Lusaka | Nearest City: Moba | Distance: 36171.20479300355 meters
+Meteorite: Machinga | Nearest City: Zomba | Distance: 21086.01161424103 meters
+Meteorite: Madhipura | Nearest City: Rajbiraj | Distance: 77795.87505083936 meters
+Meteorite: Magombedze | Nearest City: Masvingo | Distance: 108051.01666723767 meters
+Meteorite: Mahadevpur | Nearest City: Dibrugarh | Distance: 89519.48913309381 meters
+Meteorite: Maigatari-Danduma | Nearest City: Dutse | Distance: 115174.18936590213 meters
+Meteorite: Malakal | Nearest City: Malakal | Distance: 11107.358144594611 meters
+Meteorite: Manych | Nearest City: Elista | Distance: 65758.48519186274 meters
+Meteorite: Maribo | Nearest City: Svendborg | Distance: 64364.97233303349 meters
+Meteorite: Marilia | Nearest City: Marília | Distance: 4772.599408046801 meters
+Meteorite: Maromandia | Nearest City: Ambanja | Distance: 68872.1568201195 meters
+Meteorite: Maryville | Nearest City: Farragut | Distance: 11005.113153397357 meters
+Meteorite: Mason Gully | Nearest City: Sekondi | Distance: 581981.7177856007 meters
+Meteorite: Mayo Belwa | Nearest City: Yola | Distance: 51331.19893611845 meters
+Meteorite: Mbale | Nearest City: Mbale | Distance: 2667.469612320645 meters
+Meteorite: Medanitos | Nearest City: Belen | Distance: 64064.396217176 meters
+Meteorite: Messina | Nearest City: Messina | Distance: 2404.237472760427 meters
+Meteorite: Mianchi | Nearest City: Luoyang | Distance: 71700.70759535492 meters
+Meteorite: Mifflin | Nearest City: Platteville | Distance: 21226.715840182744 meters
+Meteorite: Mihonoseki | Nearest City: Matsue | Distance: 17900.277350233977 meters
+Meteorite: Millbillillie | Nearest City: Meekatharra | Distance: 188326.17981090635 meters
+Meteorite: Min-Fan-Zhun | Nearest City: Nantong | Distance: 36873.8840612372 meters
+Meteorite: Molteno | Nearest City: Aliwal North | Distance: 66566.2771046143 meters
+Meteorite: Monahans (1998) | Nearest City: Monahans | Distance: 17507.31617646874 meters
+Meteorite: Monte das Fortes | Nearest City: Beja | Distance: 33941.989881159214 meters
+Meteorite: Monze | Nearest City: Mazabuka | Distance: 45469.522771372904 meters
+Meteorite: Morávka | Nearest City: Ostrava | Distance: 32767.33173729124 meters
+Meteorite: Moss | Nearest City: Moss | Distance: 1790.7235979250372 meters
+Meteorite: Mount Tazerzait | Nearest City: Arlit | Distance: 267006.50907184696 meters
+Meteorite: Murchison | Nearest City: Shepparton | Distance: 31929.846425941487 meters
+Meteorite: Murray | Nearest City: Murray | Distance: 19761.94144837954 meters
+Meteorite: Muzaffarpur | Nearest City: Muzaffarpur | Distance: 15401.874678794606 meters
+Meteorite: Nadiabondi | Nearest City: Fada Ngourma | Distance: 69840.07975552893 meters
+Meteorite: Nantong | Nearest City: Nantong | Distance: 92469.45667381497 meters
+Meteorite: Naragh | Nearest City: Kashan | Distance: 26692.586523425296 meters
+Meteorite: Neagari | Nearest City: Kanazawa | Distance: 19915.528517321723 meters
+Meteorite: Nejo | Nearest City: Gimbi | Distance: 66258.87637792579 meters
+Meteorite: Neuschwanstein | Nearest City: Innsbruck | Distance: 52881.44409418451 meters
+Meteorite: New Halfa | Nearest City: Kassala | Distance: 76544.6721912216 meters
+Meteorite: New Orleans | Nearest City: Westwego | Distance: 5634.86489648378 meters
+Meteorite: Nikolskoe | Nearest City: Solnechnogorsk | Distance: 22986.81015890383 meters
+Meteorite: Ningbo | Nearest City: Ningbo | Distance: 6604.364683797105 meters
+Meteorite: Ningqiang | Nearest City: Guangyuan | Distance: 55209.8485436504 meters
+Meteorite: Noblesville | Nearest City: Noblesville | Distance: 6967.47903113516 meters
+Meteorite: Noventa Vicentina | Nearest City: Verona | Distance: 45160.16524677406 meters
+Meteorite: Nuevo Mercurio | Nearest City: Parras | Distance: 124810.29596016076 meters
+Meteorite: Ohuma | Nearest City: Abakaliki | Distance: 63753.98861476382 meters
+Meteorite: Okabe | Nearest City: Maebashi | Distance: 26647.493841449083 meters
+Meteorite: Omolon | Nearest City: Omolon | Distance: 150459.21238556932 meters
+Meteorite: Orlando | Nearest City: Winter Park | Distance: 5972.549640570797 meters
+Meteorite: Ouadangou | Nearest City: Bogandé | Distance: 24867.716962123013 meters
+Meteorite: Oued el Hadjar | Nearest City: Marrakesh | Distance: 210998.64400993683 meters
+Meteorite: Oum Dreyga | Nearest City: Fderik | Distance: 184854.3030442236 meters
+Meteorite: Ourique | Nearest City: Portimão | Distance: 57390.87119259909 meters
+Meteorite: Palca de Aparzo | Nearest City: Humahuaca | Distance: 27207.17844614194 meters
+Meteorite: Parambu | Nearest City: Tauá | Distance: 50407.835987676626 meters
+Meteorite: Paranaiba | Nearest City: Paranaíba | Distance: 78093.66339742525 meters
+Meteorite: Park Forest | Nearest City: Park Forest | Distance: 712.2874579338778 meters
+Meteorite: Patora | Nearest City: Raipur | Distance: 54395.23871871707 meters
+Meteorite: Patrimonio | Nearest City: Frutal | Distance: 67720.96207513759 meters
+Meteorite: Pavel | Nearest City: Turnovo | Distance: 43822.54166556673 meters
+Meteorite: Pê | Nearest City: Diébougou | Distance: 53267.6326041025 meters
+Meteorite: Peace River | Nearest City: Peace River | Distance: 41780.54524923712 meters
+Meteorite: Peckelsheim | Nearest City: Kassel | Distance: 44344.09412221184 meters
+Meteorite: Peekskill | Nearest City: Peekskill | Distance: 748.670658133705 meters
+Meteorite: Pétèlkolé | Nearest City: Dori | Distance: 48421.865729184 meters
+Meteorite: Piancaldoli | Nearest City: Bologna | Distance: 31308.04975474924 meters
+Meteorite: Piplia Kalan | Nearest City: Pali | Distance: 67021.08726939859 meters
+Meteorite: Pleşcoi | Nearest City: Buzău | Distance: 15218.616575254857 meters
+Meteorite: Portales Valley | Nearest City: Portales | Distance: 5463.852411247064 meters
+Meteorite: Pribram | Nearest City: Pizen | Distance: 49165.88592083702 meters
+Meteorite: Puerto Lápice | Nearest City: Toledo | Distance: 71771.70461547484 meters
+Meteorite: Qidong | Nearest City: Nantong | Distance: 63954.8576772769 meters
+Meteorite: Qingzhen | Nearest City: Guiyang | Distance: 25754.488006206226 meters
+Meteorite: Quija | Nearest City: Jiutai | Distance: 57351.00821856525 meters
+Meteorite: Raco | Nearest City: Tucumán | Distance: 28543.12598282757 meters
+Meteorite: Raghunathpura | Nearest City: Alwar | Distance: 24316.95984597998 meters
+Meteorite: Rahimyar Khan | Nearest City: Sadiqabad | Distance: 10847.16361898974 meters
+Meteorite: Ramsdorf | Nearest City: Münster | Distance: 48123.5735960084 meters
+Meteorite: Ras Tanura | Nearest City: Al-Qatif | Distance: 21403.30072254349 meters
+Meteorite: Red Canyon Lake | Nearest City: Sonora | Distance: 57424.269162396544 meters
+Meteorite: Revelstoke | Nearest City: Revelstoke | Distance: 65090.80911699801 meters
+Meteorite: Richland Springs | Nearest City: Brady | Distance: 34726.81237470421 meters
+Meteorite: Ruhobobo | Nearest City: Kisoro | Distance: 18445.835728533493 meters
+Meteorite: Sabrum | Nearest City: Comilla | Distance: 66603.69253599462 meters
+Meteorite: Saint-Séverin | Nearest City: Bordeaux | Distance: 82154.29574477143 meters
+Meteorite: Salem | Nearest City: Keizer | Distance: 5050.217601249569 meters
+Meteorite: Salzwedel | Nearest City: Braunschweig | Distance: 66985.71529595154 meters
+Meteorite: San Juan Capistrano | Nearest City: San Juan Capistrano | Distance: 1951.8067157117268 meters
+Meteorite: San Michele | Nearest City: Ancona | Distance: 40946.417289742116 meters
+Meteorite: San Pedro de Quiles | Nearest City: Combarbalá | Distance: 42241.27600699669 meters
+Meteorite: San Pedro Jacuaro | Nearest City: Ciudad Hidalgo | Distance: 12781.216312079028 meters
+Meteorite: Santa Lucia (2008) | Nearest City: San Juan | Distance: 3314.9488568043453 meters
+Meteorite: São Jose do Rio Preto | Nearest City: São José do Rio Preto | Distance: 1518.3145021726932 meters
+Meteorite: Sayama | Nearest City: Kawagoe | Distance: 9988.226545408257 meters
+Meteorite: Schenectady | Nearest City: Scotia | Distance: 3298.575065772964 meters
+Meteorite: Senboku | Nearest City: Akita | Distance: 47155.595061932814 meters
+Meteorite: Seoni | Nearest City: Nagpur | Distance: 71308.21750536002 meters
+Meteorite: Sfax | Nearest City: Sfax | Distance: 304.57774451613557 meters
+Meteorite: Sheyang | Nearest City: Yancheng | Distance: 29931.455685511348 meters
+Meteorite: Shuangyang | Nearest City: Changchun | Distance: 48399.2324377058 meters
+Meteorite: Silao | Nearest City: Guanajuato | Distance: 14467.134148777395 meters
+Meteorite: Sinnai | Nearest City: Cagliari | Distance: 11961.819295882739 meters
+Meteorite: Sivas | Nearest City: Tokat | Distance: 64771.088376881344 meters
+Meteorite: Sixiangkou | Nearest City: Taizhou | Distance: 7082.398583402754 meters
+Meteorite: Soheria | Nearest City: Gorakhpur | Distance: 80377.41594457005 meters
+Meteorite: Sołtmany | Nearest City: Ełk | Distance: 29859.1868615314 meters
+Meteorite: Songyuan | Nearest City: Fuyu | Distance: 16101.82120701971 meters
+Meteorite: St. Louis | Nearest City: Jennings | Distance: 3713.776841058387 meters
+Meteorite: St.-Chinian | Nearest City: Béziers | Distance: 22964.36492331862 meters
+Meteorite: Ste. Marguerite | Nearest City: Lille | Distance: 14159.15657660288 meters
+Meteorite: Sterlitamak | Nearest City: Sterlitamak | Distance: 4362.675558487875 meters
+Meteorite: Stratford | Nearest City: Bridgeport | Distance: 5329.87476305294 meters
+Meteorite: St-Robert | Nearest City: Joliette | Distance: 35931.40731379848 meters
+Meteorite: Suchy Dul | Nearest City: Hradec Králové | Distance: 48920.13545612602 meters
+Meteorite: Suizhou | Nearest City: Anlu | Distance: 43152.75103555923 meters
+Meteorite: Sulagiri | Nearest City: Kolar | Distance: 53111.08850672064 meters
+Meteorite: Sutter's Mill | Nearest City: Placerville | Distance: 12547.378903504838 meters
+Meteorite: Sylacauga | Nearest City: Sylacauga | Distance: 3366.119112570489 meters
+Meteorite: Tagish Lake | Nearest City: Whitehorse | Distance: 122063.96864143852 meters
+Meteorite: Tahara | Nearest City: Hamamatsu | Distance: 39134.68572847127 meters
+Meteorite: Tambakwatu | Nearest City: Pasuruan | Distance: 19899.234756292324 meters
+Meteorite: Tamdakht | Nearest City: Marrakesh | Distance: 107044.19984777518 meters
+Meteorite: Taonan | Nearest City: Taonan | Distance: 12170.14513971025 meters
+Meteorite: Tathlith | Nearest City: Qal at Bishah | Distance: 137793.66886374794 meters
+Meteorite: Thal | Nearest City: Bannu | Distance: 45752.23117354525 meters
+Meteorite: Thika | Nearest City: Thika | Distance: 7862.166015085504 meters
+Meteorite: Thuathe | Nearest City: Maseru | Distance: 9883.231884591787 meters
+Meteorite: Tianzhang | Nearest City: Huaiyin | Distance: 70599.80522372908 meters
+Meteorite: Tillaberi | Nearest City: Tillabéri | Distance: 9635.25679747393 meters
+Meteorite: Tissint | Nearest City: Tiznit | Distance: 207614.19863710878 meters
+*/

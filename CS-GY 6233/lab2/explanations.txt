@@ -1,0 +1,21 @@
+1. written explanation on implementing shell command executions 
+
+Use execvp(const char *file, char *const argv[]) to execute command because struct execcmd contains a char *argv[] which matches the second parameter in execvp(), and execvp() allows filename access. 
+If execvp() fails and returns -1, prints an error and exits.
+
+
+
+2. written explanation on implemented shell output redirection 
+
+We’re using open int open(const char *pathname, int flags, mode_t mode) since O_CREAT
+flag needs associated modes. In this case, we’re setting modes to user (file owner) and group and others all have read, write, and execute permission.
+We use dup2() since we don’t need O_CLOEXEC flag, which is included in dup3(). 
+If open() or dup2() fails and returns -1, prints an error and exits.
+
+
+
+3. written explanation on implemented shell pipe redirection 
+
+We would fork to create processes for the commands before and after the “|”. 
+For the prior process, we would close the standard output and use p[1]. Then we close both p[0] and p[1] and run commands. This process’s output is sent for use in the later process as input. The later process would close standard input and use p[0]. Then we close both p[0] and p[1] and run commands.
+If pipe() or fork() or dup2() fails, prints an error and exits. 
