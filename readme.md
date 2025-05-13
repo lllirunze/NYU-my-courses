@@ -6,6 +6,7 @@ This repository records some of the course code information during master's degr
 - CS-GY 6033: [Design and Analysis of Algorithms I](https://github.com/lllirunze/NYU-my-courses/tree/master/CS-GY%206033)
 - CS-GY 6053: [Foundations of Data Science](https://github.com/lllirunze/NYU-my-courses/tree/master/CS-GY%206053)
 - CS-GY 6233: [Introduction to Operation Systems](https://github.com/lllirunze/NYU-my-courses/tree/master/CS-GY%206233)
+- CS-GY 6313: [Information Visualization](https://github.com/lllirunze/NYU-my-courses/tree/master/CS-GY%206313)
 - CS-GY 6513: [Big Data](https://github.com/lllirunze/NYU-my-courses/tree/master/CS-GY%206513)
 - CS-GY 6543: [Human Computer Interaction](https://github.com/lllirunze/NYU-my-courses/tree/master/CS-GY%206543)
 - CS-GY 6643: [Computer Vision](https://github.com/lllirunze/NYU-my-courses/tree/master/CS-GY%206643)
