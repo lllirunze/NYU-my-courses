@@ -1,0 +1,72 @@
+CS-GY 6313 Information Visualization
+Exercise: Graphical Decoding
+Name: Runze Li
+NetID: rl5083
+
+--------------------------------------------
+Chart1
+
+Data Item: counties in US
+Mark: area
+Magnitude Channels:
+	● Color saturation: percentage of income from government benefits
+Identity Channels:
+	● Spatial region: county location
+
+--------------------------------------------
+Chart2
+
+Data Item: NFL quarterback players
+Mark: line
+Magnitude Channels:
+	● X-position: years
+	● Y-position: touchdown passes
+Identity Channels:
+	● Text: name
+	● Color hue: player status (active or retired, and Peyton Manning is highlighted)
+
+--------------------------------------------
+Chart3
+
+Data Item: income of persons in different occupations
+Mark: point
+Magnitude Channels:
+	● X-position: salary
+	● Y-position: occupation
+Identity Channels:
+	● Color hue: occupation category (Different occupations are divided into different colors)
+
+--------------------------------------------
+Chart4
+
+Data Item: NBA draft players
+Mark: area (rectangles)
+Magnitude Channels:
+	● X-position: years
+	● Y-position: ranking
+	● Color saturation: VORP based on players' performance
+Identity Channels:
+	● Spatial region: rectangles indicate different NBA draft picks in one year
+
+--------------------------------------------
+Chart5
+
+Data Item: wind forecasts for different areas
+Mark: area (rectangles)
+Magnitude Channels:
+	● X-position: longitude 
+	● Y-position: latitude
+	● Color saturation: prediction skill
+	● Tilt: predicted wind direction
+	● Size (width of rectangles): predicted wind strength
+Identity Channels:
+	● Spatial region: wind locations in the map
+	● Color hue: predicted wind change
+
+--------------------------------------------
+
+
+
+
+
+
